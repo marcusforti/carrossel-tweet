@@ -32,4 +32,23 @@ if ($py) {
 } else {
     Write-Host "Atencao: Python nao encontrado. Instale em https://www.python.org/downloads/ e rode: python -m pip install pillow"
 }
-Write-Host "`nPronto! Abra o Claude Code (ou o Codex) e peça: crie um carrossel tweet sobre <seu tema>."
+
+# Atalho "Carrossel" na Mesa: abre o app (pagina com os assuntos e o botao Gerar)
+$mesa = if ($env:CARROSSEL_DESKTOP) { $env:CARROSSEL_DESKTOP } else { [Environment]::GetFolderPath("Desktop") }
+if ($py -and (Test-Path $mesa)) {
+    $server = "$HOME\.codex\skills\carrossel-tweet\app\server.py"
+    $pyw = Join-Path (Split-Path $py.Source) "pythonw.exe"
+    if (-not (Test-Path $pyw)) { $pyw = Join-Path (Split-Path $py.Source) "pyw.exe" }
+    if (-not (Test-Path $pyw)) { $pyw = $py.Source }
+    $lnk = (New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path $mesa "Carrossel.lnk"))
+    $lnk.TargetPath = $pyw
+    $lnk.Arguments = "`"$server`""
+    $lnk.WorkingDirectory = Split-Path (Split-Path $server)
+    $lnk.Description = "Gerar carrosseis estilo tweet"
+    $lnk.Save()
+    Write-Host "Atalho criado: $(Join-Path $mesa 'Carrossel.lnk')"
+}
+if (-not (Get-Command codex -ErrorAction SilentlyContinue)) {
+    Write-Host "Aviso: nao achei o Codex. Instale o app do Codex (https://developers.openai.com/codex/app) e entre com a sua conta do ChatGPT."
+}
+Write-Host "`nPronto! Dois cliques em 'Carrossel' na Mesa, ou peca no Claude Code/Codex: crie um carrossel tweet sobre <seu tema>."
