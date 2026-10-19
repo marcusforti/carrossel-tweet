@@ -39,6 +39,7 @@ Também funciona mandando um texto seu ou a transcrição de um vídeo: "transfo
 O instalador também cria o atalho **Carrossel** na sua Mesa. Dois cliques e abre uma página no navegador:
 
 1. **Seu perfil** (só na primeira vez): nome, @, uma frase sobre o seu negócio e a sua foto.
+   **Sobre o seu negócio** (recomendado): o "cérebro" dos carrosséis. Clique em "Copiar prompt para o ChatGPT", cole no ChatGPT (que já te conhece), copie a resposta e cole no campo. O que estiver ali (o que você vende, para quem, dores, histórias reais, provas, tom de voz e CTA) é usado em todo carrossel.
 2. **Assuntos**: um por linha. Cada linha vira um carrossel.
 3. **Gerar**: o Codex (ou o Claude Code) escreve e desenha tudo por trás. Leva uns 2 a 4 minutos por carrossel.
 4. A pasta abre sozinha com os cards e a `legenda.txt`. Na página, tem "Abrir pasta" e "Copiar legenda".

@@ -147,7 +147,12 @@ PROMPT = """Você vai criar UM carrossel estilo tweet para Instagram, sem fazer 
    e siga o método dela (estrutura de 10 cards, gancho, regras de copy, legenda).
 2. Assunto do carrossel: "{assunto}"
    Autor: {nome} ({handle}). Nicho e contexto do autor: {nicho}
-   Escreva em português do Brasil, na voz do autor, em primeira pessoa. Não invente números, clientes ou fatos sobre o autor.
+   Sobre o negócio do autor (fonte de verdade para tom de voz, histórias, provas e CTA; o que estiver marcado [confirmar] não é fato e não deve ser usado como fato):
+   <<<
+{negocio}
+   >>>
+   Escreva em português do Brasil, na voz do autor, em primeira pessoa. Não invente números, clientes ou fatos sobre o autor:
+   use só os que aparecem acima. Se o perfil indicar uma chamada preferida (CTA), use-a no último card.
 3. Crie o arquivo {json_path} neste formato:
    {{"nome": "{nome}", "handle": "{handle}", "foto": "{foto}", "tema": "{tema}", "saida": "{saida}",
      "cards": [{{"texto": "...", "destaques": ["..."]}}, ..., {{"texto": "...", "cta": "Comenta PALAVRA", "rodape": "..."}}]}}
@@ -174,6 +179,7 @@ def rodar_job(job):
     prompt = PROMPT.format(
         skill=os.path.join(SKILL, "SKILL.md"), assunto=job["assunto"].replace('"', "'"),
         nome=perfil.get("nome", ""), handle=perfil.get("handle", ""), nicho=perfil.get("nicho") or "não informado",
+        negocio=(perfil.get("negocio") or "(não preenchido)").replace("{", "(").replace("}", ")"),
         foto=(perfil.get("foto") or "").replace("\\", "/"), tema=job["tema"], saida=pasta.replace("\\", "/"),
         json_path=jp.replace("\\", "/"), n=job["cards"], python=sys.executable.replace("\\", "/"),
         render=RENDER.replace("\\", "/"), legenda=os.path.join(pasta, "legenda.txt").replace("\\", "/"))
@@ -286,7 +292,7 @@ class H(BaseHTTPRequestHandler):
         d = self.corpo()
         if u.path == "/api/perfil":
             perfil = ler_json(PERFIL, {})
-            perfil.update({k: d[k].strip() for k in ("nome", "handle", "nicho") if isinstance(d.get(k), str)})
+            perfil.update({k: d[k].strip() for k in ("nome", "handle", "nicho", "negocio") if isinstance(d.get(k), str)})
             if perfil.get("handle") and not perfil["handle"].startswith("@"):
                 perfil["handle"] = "@" + perfil["handle"]
             if d.get("foto"):

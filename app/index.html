@@ -67,6 +67,16 @@ footer select{width:auto;padding:4px 8px;font-size:13px}
     </div>
   </section>
 
+  <section class="box" id="boxNegocio">
+    <h2><span class="num" style="background:var(--amarelo);color:#000">★</span> Sobre o seu negócio <small style="color:var(--sub);font-weight:400">(o cérebro dos carrosséis)</small></h2>
+    <p style="margin:0 0 6px;color:var(--sub);font-size:14px">Quanto mais a IA souber de você, mais o carrossel parece seu: o que você vende, para quem, as dores do cliente, histórias reais, provas, tom de voz e a chamada que você gosta. Tudo o que estiver aqui é usado em todo carrossel.</p>
+    <div class="acoes"><button class="leve" onclick="copiarPrompt()">📋 Copiar prompt para o ChatGPT</button></div>
+    <p style="margin:6px 0 0;color:var(--sub);font-size:13px">Cole o prompt no ChatGPT (ele já te conhece), copie a resposta e cole aqui embaixo.</p>
+    <label>Cole aqui a resposta do ChatGPT (ou escreva do seu jeito)</label>
+    <textarea id="negocio" style="min-height:220px" placeholder="NOME E MARCA: ...&#10;O QUE EU VENDO: ...&#10;PARA QUEM: ..."></textarea>
+    <div class="linha" style="align-items:center;margin-top:10px"><button class="azul" style="flex:none" onclick="salvarNegocio()">Salvar</button><small id="negInfo" style="color:var(--sub)"></small></div>
+  </section>
+
   <section class="box">
     <h2><span class="num">2</span> Assuntos</h2>
     <label>Um assunto por linha. Cada linha vira um carrossel.</label>
@@ -88,7 +98,29 @@ footer select{width:auto;padding:4px 8px;font-size:13px}
 <div id="zoom" onclick="this.style.display='none'"><img></div>
 <div class="toast" id="toast"></div>
 <script>
-let E={},editando=false;
+let E={},editando=false,negCarregado=false;
+const PROMPT_GPT=`Você me conhece pela memória e pelo nosso histórico de conversas. Quero que você monte o PERFIL DO MEU NEGÓCIO para eu usar numa ferramenta que escreve carrosséis de Instagram com a minha voz.
+
+Regras:
+- Use só o que você sabe de verdade sobre mim. Onde não souber, escreva [confirmar] em vez de inventar.
+- Não invente números, clientes, nomes nem histórias.
+- Seja específico e concreto (cenas, objetos, frases que eu falo), não genérico.
+- Responda exatamente no formato abaixo, em português, sem comentários antes ou depois.
+
+NOME E MARCA:
+O QUE EU VENDO:
+PARA QUEM (cliente ideal, quem decide a compra):
+DORES DO MEU CLIENTE (inclusive as que ele não fala):
+O QUE O MERCADO FAZ ERRADO (e eu discordo):
+MINHA TESE (a ideia que eu repito):
+COMO EU TRABALHO (meu método, em passos):
+HISTÓRIAS E CASOS REAIS (com os detalhes que aconteceram):
+PROVAS E NÚMEROS (só os reais):
+TOM DE VOZ (como eu falo):
+PALAVRAS E FRASES QUE SÃO MINHAS:
+O QUE EU NUNCA DIGO OU NUNCA FAÇO:
+CHAMADA PREFERIDA NO FIM DO POST (CTA):
+OBJETIVO DO MEU INSTAGRAM AGORA:`;
 const $=id=>document.getElementById(id);
 function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2200)}
 async function api(u,d){const r=await fetch(u,d?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}:{});return r.json()}
@@ -97,6 +129,8 @@ async function carregar(){
   E=await api('/api/estado');
   const p=E.perfil||{}, temPerfil=p.nome&&p.handle;
   $('casa').textContent=E.casa; $('motor').value=E.motor.motor;
+  if(!negCarregado){$('negocio').value=p.negocio||'';negCarregado=true}
+  $('negInfo').textContent=p.negocio?`✓ salvo (${p.negocio.length} caracteres). Usado em todo carrossel.`:'Ainda vazio: recomendado preencher.';
   if(temPerfil&&!editando){
     $('perfilForm').style.display='none';
     $('perfilVer').innerHTML=`<div class="perfil-ok"><img class="avatar" src="${p.foto?'/arquivo/_perfil/'+p.foto.split(/[\\/]/).pop()+'?'+Date.now()%100000:''}"><div><b>${esc(p.nome)}<span class="selo"></span></b><span>${esc(p.handle)}</span></div><div style="flex:1"></div><button class="leve" onclick="editar()">Editar</button></div>`;
@@ -123,6 +157,8 @@ async function salvarPerfil(){
   await api('/api/perfil',{nome:$('pNome').value,handle:$('pHandle').value,nicho:$('pNicho').value,foto});
   editando=false;toast('Perfil salvo');carregar();
 }
+function copiarPrompt(){navigator.clipboard.writeText(PROMPT_GPT);toast('Prompt copiado. Cole no ChatGPT.')}
+async function salvarNegocio(){await api('/api/perfil',{negocio:$('negocio').value});toast('Salvo! Vale para todos os carrosséis');carregar()}
 async function gerar(){
   if(!(E.perfil&&E.perfil.nome)) return toast('Primeiro salve o seu perfil');
   const r=await api('/api/gerar',{assuntos:$('assuntos').value,tema:$('tema').value,cards:$('cards').value});
