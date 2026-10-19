@@ -45,4 +45,4 @@ Também funciona mandando um texto seu ou a transcrição de um vídeo: "transfo
 
 ## Créditos
 
-Criado por **Marcus Forti**. Inspirado em carrosseis-tweet-tedson, de Tedson Santos (licença MIT). Veja o arquivo `LICENSE`.
+Criado por **Marcus Forti**. Licença MIT; créditos e avisos no arquivo `LICENSE`.
