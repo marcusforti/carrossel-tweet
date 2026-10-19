@@ -43,8 +43,19 @@ EOF
   echo "Atalho criado: $ATALHO"
 fi
 
-if ! command -v codex >/dev/null 2>&1 && [ ! -d /Applications/Codex.app ]; then
-  echo "Aviso: não achei o Codex. Instale o app do Codex (https://developers.openai.com/codex/app) e entre com a sua conta do ChatGPT."
+# O app Carrossel usa o comando "codex" (Codex CLI) por trás. Se faltar, instala pelo instalador oficial da OpenAI.
+CODEX="$(command -v codex || true)"
+[ -z "$CODEX" ] && [ -x "$HOME/.local/bin/codex" ] && CODEX="$HOME/.local/bin/codex"
+if [ -z "$CODEX" ] && [ -z "$CARROSSEL_SEM_CODEX" ]; then
+  echo "Instalando o Codex CLI (instalador oficial da OpenAI)..."
+  curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh || echo "Não deu para instalar o Codex CLI agora."
+  [ -x "$HOME/.local/bin/codex" ] && CODEX="$HOME/.local/bin/codex"
+fi
+if [ -n "$CODEX" ]; then
+  echo "Codex pronto: $("$CODEX" --version 2>/dev/null)"
+  "$CODEX" login status >/dev/null 2>&1 || echo "Falta entrar com a sua conta do ChatGPT: abra o Carrossel e clique em \"Entrar com o ChatGPT\" (ou rode: codex login)."
+else
+  echo "Aviso: o Codex ainda não está instalado. Abra o Carrossel e clique em \"Instalar o Codex\"."
 fi
 echo
 echo "Pronto! Dê dois cliques em \"Carrossel\" na Mesa, ou peça no Claude Code/Codex: crie um carrossel tweet sobre <seu tema>."

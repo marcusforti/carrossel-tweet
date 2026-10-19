@@ -102,7 +102,9 @@ async function carregar(){
     $('perfilVer').innerHTML=`<div class="perfil-ok"><img class="avatar" src="${p.foto?'/arquivo/_perfil/'+p.foto.split(/[\\/]/).pop()+'?'+Date.now()%100000:''}"><div><b>${esc(p.nome)}<span class="selo"></span></b><span>${esc(p.handle)}</span></div><div style="flex:1"></div><button class="leve" onclick="editar()">Editar</button></div>`;
   } else if(!editando){ $('perfilForm').style.display='block'; $('perfilVer').innerHTML=''; }
   const m=E.motor;
-  $('aviso').innerHTML=(!m.instalado||!m.logado)?`<div class="aviso"><span>⚠️ ${esc(m.mensagem)}</span>${m.instalado&&m.motor==='codex'?'<button class="azul" onclick="login()">Clique aqui para entrar com o ChatGPT</button>':''}</div>`:'';
+  let bt='';
+  if(m.motor==='codex') bt=!m.instalado?'<button class="azul" onclick="instalarCodex()">Instalar o Codex</button>':'<button class="azul" onclick="login()">Clique aqui para entrar com o ChatGPT</button>';
+  $('aviso').innerHTML=(!m.instalado||!m.logado)?`<div class="aviso"><span>⚠️ ${esc(m.mensagem)}</span>${bt}</div>`:'';
   const jobs=(E.jobs||[]).filter(j=>j.estado!=='pronto'||(Date.now()/1000-(j.fim||0))<15);
   $('boxFila').style.display=jobs.length?'block':'none';
   $('fila').innerHTML=jobs.map(j=>{
@@ -129,6 +131,7 @@ async function gerar(){
 }
 function abrir(p){api('/api/abrir',{pasta:p})}
 function login(){api('/api/login',{});toast('Abriu a janela de login do ChatGPT')}
+function instalarCodex(){api('/api/instalar-codex',{});toast('Abriu a janela de instalação. Espere terminar.')}
 function trocarMotor(){api('/api/motor',{motor:$('motor').value}).then(carregar)}
 function copiar(i){navigator.clipboard.writeText(E.resultados[i].legenda);toast('Legenda copiada')}
 function zoom(s){$('zoom').querySelector('img').src=s;$('zoom').style.display='grid'}

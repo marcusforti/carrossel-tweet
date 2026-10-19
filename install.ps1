@@ -66,7 +66,32 @@ if ($py -and (Test-Path $mesa)) {
     $lnk.Save()
     Write-Host "Atalho criado: $(Join-Path $mesa 'Carrossel.lnk')"
 }
-if (-not (Get-Command codex -ErrorAction SilentlyContinue)) {
-    Write-Host "Aviso: nao achei o Codex. Instale o app do Codex (https://developers.openai.com/codex/app) e entre com a sua conta do ChatGPT."
+# O app Carrossel usa o comando "codex" (Codex CLI) por tras. O app do Codex nem sempre traz esse comando,
+# entao, se faltar, instala o CLI pelo instalador oficial da OpenAI (nao precisa de Node).
+function Find-Codex {
+    $cands = @(Get-Command codex -All -ErrorAction SilentlyContinue | ForEach-Object { $_.Source })
+    $cands += "$env:LOCALAPPDATA\Programs\OpenAI\Codex\bin\codex.exe"
+    foreach ($c in $cands) {
+        if ($c -and (Test-Path $c)) {
+            try { $v = & $c --version 2>$null; if ($LASTEXITCODE -eq 0) { return @{ Path = $c; Version = "$v" } } } catch {}
+        }
+    }
+    return $null
 }
-Write-Host "`nPronto! Dois cliques em 'Carrossel' na Mesa, ou peca no Claude Code/Codex: crie um carrossel tweet sobre <seu tema>."
+$codex = Find-Codex
+if (-not $codex -and -not $env:CARROSSEL_SEM_CODEX) {
+    Write-Host "Instalando o Codex CLI (instalador oficial da OpenAI)..."
+    $env:CODEX_NON_INTERACTIVE = "1"
+    try { & ([scriptblock]::Create((Invoke-RestMethod https://chatgpt.com/codex/install.ps1))) } catch { Write-Host "Nao deu para instalar o Codex CLI: $_" }
+    $codex = Find-Codex
+}
+if ($codex) {
+    Write-Host "Codex pronto: $($codex.Version)"
+    $st = & $codex.Path login status 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0 -or $st -match "Not logged") {
+        Write-Host "Falta entrar com a sua conta do ChatGPT: abra o Carrossel e clique em 'Entrar com o ChatGPT' (ou rode: codex login)."
+    }
+} else {
+    Write-Host "Aviso: o Codex ainda nao esta instalado. Abra o Carrossel e clique em 'Instalar o Codex'."
+}
+Write-Host "`nPronto! Dois cliques em 'Carrossel' na Area de Trabalho, ou peca no Claude Code/Codex: crie um carrossel tweet sobre <seu tema>."

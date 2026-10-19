@@ -76,7 +76,9 @@ def achar_codex():
     if SISTEMA == "Darwin":
         candidatos += glob.glob("/Applications/Codex.app/Contents/Resources/**/codex", recursive=True)
         candidatos += glob.glob(os.path.expanduser("~/Applications/Codex.app/Contents/Resources/**/codex"), recursive=True)
-        candidatos += ["/opt/homebrew/bin/codex", "/usr/local/bin/codex"]
+        candidatos += ["/opt/homebrew/bin/codex", "/usr/local/bin/codex", os.path.expanduser("~/.local/bin/codex")]
+    elif SISTEMA == "Linux":
+        candidatos += [os.path.expanduser("~/.local/bin/codex")]
     elif SISTEMA == "Windows":
         local = os.environ.get("LOCALAPPDATA", "")
         candidatos += [os.path.join(local, "Programs", "OpenAI", "Codex", "bin", "codex.exe"),
@@ -101,7 +103,7 @@ def status_motor():
     b = achar_codex()
     if not b:
         return {"motor": "codex", "instalado": False, "logado": False,
-                "mensagem": "Codex não encontrado. Instale o app do Codex (developers.openai.com/codex/app) ou rode: npm i -g @openai/codex"}
+                "mensagem": "Falta instalar o Codex, o assistente que escreve os carrosséis. Clique no botão e espere a janela terminar."}
     try:
         r = subprocess.run([b, "login", "status"], capture_output=True, text=True, timeout=30, encoding="utf-8", errors="replace")
         saida = (r.stdout + r.stderr).lower()
@@ -110,6 +112,18 @@ def status_motor():
         logado = False
     return {"motor": "codex", "instalado": True, "logado": logado,
             "mensagem": "" if logado else "Falta entrar com a sua conta do ChatGPT."}
+
+
+def instalar_codex():
+    """Abre uma janela rodando o instalador oficial do Codex CLI (não precisa de Node)."""
+    if SISTEMA == "Windows":
+        subprocess.Popen(["cmd", "/c", "start", "Instalando o Codex", "powershell", "-NoExit", "-ExecutionPolicy", "Bypass",
+                          "-Command", "irm https://chatgpt.com/codex/install.ps1 | iex; Write-Host ''; Write-Host 'Pronto! Pode fechar esta janela e voltar ao Carrossel.'"])
+    elif SISTEMA == "Darwin":
+        subprocess.Popen(["osascript", "-e", 'tell application "Terminal" to do script "curl -fsSL https://chatgpt.com/codex/install.sh | sh; echo; echo Pronto! Pode fechar esta janela."'])
+    else:
+        subprocess.Popen(["sh", "-c", "curl -fsSL https://chatgpt.com/codex/install.sh | sh"])
+    return True
 
 
 def fazer_login():
@@ -309,6 +323,8 @@ class H(BaseHTTPRequestHandler):
             return self.enviar(200, {"ok": True})
         if u.path == "/api/login":
             return self.enviar(200, {"ok": fazer_login()})
+        if u.path == "/api/instalar-codex":
+            return self.enviar(200, {"ok": instalar_codex()})
         if u.path == "/api/motor":
             if d.get("motor") in ("codex", "claude"):
                 cfg = ler_json(CONFIG, {})

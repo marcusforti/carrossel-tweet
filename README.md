@@ -45,7 +45,9 @@ O instalador também cria o atalho **Carrossel** na sua Mesa. Dois cliques e abr
 
 Tudo fica em `~/Carrosseis/AAAA-MM-DD_assunto/`.
 
-Para o app funcionar, você precisa do **Codex** com login na sua conta do ChatGPT ([app do Codex](https://developers.openai.com/codex/app); o app usa o comando `codex` por trás) ou do **Claude Code**. Se faltar login, a própria página mostra o botão "Entrar com o ChatGPT". Para usar o Claude Code no lugar do Codex, troque o "Motor" no rodapé da página.
+Por trás, o app usa o comando `codex` (o **Codex CLI**), com login na sua conta do ChatGPT (plano pago). Atenção: o app do **ChatGPT** é diferente do app do **Codex**, e nem o app do Codex traz sempre esse comando. Por isso o instalador confere se o `codex` funciona e, se faltar, instala o Codex CLI pelo instalador oficial da OpenAI (`chatgpt.com/codex/install.ps1` no Windows, `install.sh` no Mac), que não precisa de Node. Se ainda faltar alguma coisa, a própria página mostra o botão "Instalar o Codex" ou "Entrar com o ChatGPT". Para usar o Claude Code no lugar do Codex, troque o "Motor" no rodapé da página.
+
+No Windows, se o Python não estiver instalado, o instalador instala o Python 3.12 sozinho pelo `winget`, só para o seu usuário, sem pedir senha de administrador.
 
 No Mac, se o Python ainda não estiver instalado, o sistema pede para instalar as "ferramentas de linha de comando" da Apple: clique em Instalar, espere terminar e rode o instalador de novo.
 
