@@ -24,8 +24,26 @@ foreach ($dest in @("$HOME\.claude\skills\carrossel-tweet", "$HOME\.codex\skills
 }
 Remove-Item $tmp -Recurse -Force
 
-$py = Get-Command python -ErrorAction SilentlyContinue
-if (-not $py) { $py = Get-Command py -ErrorAction SilentlyContinue }
+function Find-Python {
+    # Ignora o "python" falso do Windows (atalho da Microsoft Store em WindowsApps, que não roda nada)
+    foreach ($nome in @("python", "py")) {
+        foreach ($c in @(Get-Command $nome -All -ErrorAction SilentlyContinue)) {
+            if ($c.Source -like "*\WindowsApps\*") { continue }
+            try { & $c.Source --version *> $null; if ($LASTEXITCODE -eq 0) { return $c } } catch {}
+        }
+    }
+    foreach ($p in (Get-ChildItem "$env:LOCALAPPDATA\Programs\Python\Python3*\python.exe" -ErrorAction SilentlyContinue | Sort-Object FullName -Descending)) {
+        return (Get-Command $p.FullName)
+    }
+    return $null
+}
+
+$py = Find-Python
+if (-not $py -and (Get-Command winget -ErrorAction SilentlyContinue)) {
+    Write-Host "Python nao encontrado. Instalando o Python 3.12 (so para este usuario, sem senha de administrador)..."
+    winget install -e --id Python.Python.3.12 --scope user --silent --accept-package-agreements --accept-source-agreements | Out-Null
+    $py = Find-Python
+}
 if ($py) {
     & $py.Source -m pip install --quiet --upgrade pillow
     Write-Host "Pillow instalado."

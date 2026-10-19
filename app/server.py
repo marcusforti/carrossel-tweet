@@ -79,6 +79,8 @@ def achar_codex():
         candidatos += ["/opt/homebrew/bin/codex", "/usr/local/bin/codex"]
     elif SISTEMA == "Windows":
         local = os.environ.get("LOCALAPPDATA", "")
+        candidatos += [os.path.join(local, "Programs", "OpenAI", "Codex", "bin", "codex.exe"),
+                       os.path.join(local, "Microsoft", "WindowsApps", "codex.exe")]
         candidatos += glob.glob(os.path.join(local, "Programs", "*Codex*", "**", "codex.exe"), recursive=True)
         candidatos += glob.glob(os.path.join(os.environ.get("APPDATA", ""), "npm", "codex.cmd"))
     for c in candidatos:
