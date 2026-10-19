@@ -1,0 +1,20 @@
+{
+  "nome": "Seu Nome",
+  "handle": "@seuperfil",
+  "foto": "avatar-exemplo.png",
+  "tema": "escuro",
+  "destaque": "#FFB020",
+  "saida": "saida-exemplo",
+  "cards": [
+    {"texto": "Eu postei todo dia durante 90 dias.\n\nE perdi seguidor.", "destaques": ["90", "perdi"]},
+    {"texto": "Calma, não é um post contra constância.\n\nÉ um post contra a constância errada.", "destaques": ["errada"]},
+    {"texto": "Eu achava que o algoritmo premiava quem aparece mais.\n\nEntão eu aparecia. Com qualquer coisa.", "destaques": ["qualquer"]},
+    {"texto": "O resultado foi um perfil cheio de posts que até eu esquecia no dia seguinte.", "destaques": ["esquecia"]},
+    {"texto": "Aí eu entendi uma coisa.\n\nConstância não é o post aparecer todo dia.\n\nÉ a IDEIA aparecer todo dia.", "destaques": ["ideia"]},
+    {"texto": "Quando você tem uma ideia central, cada post vira um ângulo dela.\n\nO seguidor começa a te reconhecer antes de ler o seu nome.", "destaques": ["reconhecer"]},
+    {"texto": "Hoje eu posto menos.\n\n• Uma ideia por semana\n• Três ângulos diferentes\n• Uma pergunta pro público", "destaques": ["menos"]},
+    {"texto": "E o perfil que antes sumia agora é lembrado.\n\nNão porque eu apareço mais. Porque eu digo a mesma coisa de jeitos diferentes.", "destaques": ["lembrado"]},
+    {"texto": "Se você está cansado de postar e não ser lembrado, o problema talvez não seja frequência.\n\nÉ falta de uma ideia que seja só sua.", "destaques": ["frequência", "sua"]},
+    {"texto": "Quer o exercício que eu uso pra achar essa ideia central?", "destaques": ["ideia"], "cta": "Comenta IDEIA", "rodape": "que eu te mando no direct."}
+  ]
+}
